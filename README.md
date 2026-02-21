@@ -1,14 +1,33 @@
-# Sorten
+<h1 align="center">📦 Sorten</h1>
 
-A blazing-fast CLI tool built with C++ to sort files into categorized directories based on their extensions.
+<p align="center">
+  A blazing-fast, cross-platform CLI tool built with C++ to organize and sort files into categorized directories based on their extensions.
+</p>
 
-## Installation
+<p align="center">
+  <a href="https://github.com/fiandev/sorten-cpp/actions/workflows/release.yml"><img src="https://github.com/fiandev/sorten-cpp/actions/workflows/release.yml/badge.svg" alt="Auto Release"></a>
+  <img src="https://img.shields.io/github/v/release/fiandev/sorten-cpp" alt="Latest Release">
+  <img src="https://img.shields.io/github/license/fiandev/sorten-cpp" alt="License">
+</p>
 
-You can install Sorten using the pre-compiled binaries available for your operating system.
+---
 
-### Linux
+## ⚡ Features
 
-Download the binary and move it to a directory in your PATH (e.g., `/usr/local/bin`):
+- **Blazing Fast**: Written in modern C++ to ensure sub-millisecond file moving.
+- **Cross-Platform**: Available natively for Linux, macOS, and Windows.
+- **Customizable**: Sort by default rules or inject your own `config.json` rules.
+- **Glob Support**: Use flexible glob patterns to match exact file behaviors.
+
+---
+
+## 🚀 Installation
+
+You can install Sorten instantly by downloading the pre-compiled binaries for your operating system.
+
+### 🐧 Linux
+
+Download the binary and move it to a directory within your `PATH` (e.g., `/usr/local/bin`):
 
 ```bash
 curl -L -o sorten https://github.com/fiandev/sorten-cpp/releases/latest/download/sorten-linux
@@ -16,9 +35,7 @@ chmod +x sorten
 sudo mv sorten /usr/local/bin/
 ```
 
-### macOS
-
-Download the binary and move it to a directory in your PATH (e.g., `/usr/local/bin`):
+### 🍎 macOS
 
 ```bash
 curl -L -o sorten https://github.com/fiandev/sorten-cpp/releases/latest/download/sorten-macos
@@ -26,42 +43,56 @@ chmod +x sorten
 sudo mv sorten /usr/local/bin/
 ```
 
-### Windows
+### 🪟 Windows
 
 1. Download the `sorten-windows.exe` binary from the [Releases](https://github.com/fiandev/sorten-cpp/releases) page.
 2. Rename the downloaded file to `sorten.exe`.
-3. Move `sorten.exe` to a directory of your choice.
-4. Add that directory to your system's `PATH` environment variable so you can run it from anywhere in the command prompt or PowerShell.
+3. Add it to a directory included in your system's `PATH` environment variable.
 
-## Usage
+---
 
-Run the tool by specifying the `run` command. You can also provide an optional path to the directory you want to sort (defaults to the current directory):
+## 💻 Usage
+
+Sorten uses a straightforward command interface.
+
+```bash
+sorten run [path] [options]
+```
+
+To sort the current directory (`.`):
 
 ```bash
 sorten run .
 ```
 
-To see the list of commands and options, simply run:
+To sort a specific directory:
 
 ```bash
-sorten
+sorten run /path/to/my/messy/folder
 ```
 
 ### Options
 
-- `-c, --config <path>`: Path to the `config.json` file (default: `./config.json`)
+| Flag           | Name        | Description                                                    |
+| :------------- | :---------- | :------------------------------------------------------------- |
+| `-c, --config` | Config Path | Path to a custom `config.json` file (default: `./config.json`) |
+| `-h, --help`   | Help        | View usage and commands list                                   |
 
-## Configuration
+---
 
-Create a `config.json` file in your working directory with sorting rules. Each key is the destination directory pattern, and the value is the glob pattern for matching files.
+## ⚙️ Configuration
 
-The `@` symbol in the destination will be replaced with the file extension.
+Sorten reads sorting rules from a `config.json` file. Each key acts as the **destination directory pattern**, and the value is the **glob pattern** for matching files.
 
-Example `config.json`:
+> The `@` symbol in the destination directory key will be replaced with the exact file extension.
+
+### Default Rules (Fallback)
+
+If no `config.json` is provided, Sorten automatically applies the following default rules:
 
 ```json
 {
-  "./multimedia/images/@": "./*.{jpg,png,webp,gif,jpeg}",
+  "./multimedia/images/@": "./*.{jpg,png,webp,gif,jpeg,svg}",
   "./multimedia/videos/@": "./*.{mp4,mov}",
   "./multimedia/audios/@": "./*.{mp3,m4a}",
   "./files/archives/@": "./*.{zip,rar,tar.gz,7z}",
@@ -76,14 +107,16 @@ Example `config.json`:
 }
 ```
 
-## compile and run
+---
 
-```sh
+## 🛠️ Building from Source
+
+If you prefer to compile the application from the source code, you can use `make`. Make sure you have `g++` installed.
+
+```bash
+git clone https://github.com/fiandev/sorten-cpp.git
+cd sorten-cpp
+
+# Compile without running
 make compile sorten.cpp
 ```
-
-If no config file is found, it uses default rules similar to the above.
-
-## License
-
-MIT

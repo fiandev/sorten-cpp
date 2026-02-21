@@ -6,9 +6,10 @@
 #include <filesystem>
 #include <regex>
 
-namespace fs = std::filesystem;
+using namespace std;
+namespace fs = filesystem;
 
-const std::map<std::string, std::string> defaultRules = {
+const map<string, string> defaultRules = {
     {"./multimedia/images/@", "./*.{jpg,png,webp,gif,jpeg,svg}"},
     {"./multimedia/videos/@", "./*.{mp4,mov}"},
     {"./multimedia/audios/@", "./*.{mp3,m4a}"},
@@ -24,48 +25,48 @@ const std::map<std::string, std::string> defaultRules = {
 };
 
 // A very naive JSON parser for flat key-value string pairs
-std::map<std::string, std::string> parseConfig(const std::string& path) {
-    std::map<std::string, std::string> rules;
-    std::ifstream file(path);
+map<string, string> parseConfig(const string& path) {
+    map<string, string> rules;
+    ifstream file(path);
     if (!file.is_open()) return rules; // Default or empty
 
-    std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    std::regex pair_regex(R"(\s*\"([^\"]+)\"\s*:\s*\"([^\"]+)\"\s*)");
-    auto words_begin = std::sregex_iterator(content.begin(), content.end(), pair_regex);
-    auto words_end = std::sregex_iterator();
+    string content((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+    regex pair_regex(R"(\s*\"([^\"]+)\"\s*:\s*\"([^\"]+)\"\s*)");
+    auto words_begin = sregex_iterator(content.begin(), content.end(), pair_regex);
+    auto words_end = sregex_iterator();
 
-    for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
-        std::smatch match = *i;
+    for (sregex_iterator i = words_begin; i != words_end; ++i) {
+        smatch match = *i;
         rules[match[1].str()] = match[2].str();
     }
     return rules;
 }
 
 // Convert fast-glob string `*.{jpg,png}` or `*.apk` into a list of suffixes `.jpg`, `.png`, `.apk`
-std::vector<std::string> extractExtensions(const std::string& globPat) {
-    std::vector<std::string> exts;
-    std::regex braced(R"(\.\/\*\.\{([^\}]+)\})");
-    std::smatch match;
-    if (std::regex_search(globPat, match, braced)) {
-        std::string list = match[1].str();
+vector<string> extractExtensions(const string& globPat) {
+    vector<string> exts;
+    regex braced(R"(\.\/\*\.\{([^\}]+)\})");
+    smatch match;
+    if (regex_search(globPat, match, braced)) {
+        string list = match[1].str();
         size_t start = 0;
         size_t end = list.find(',');
-        while (end != std::string::npos) {
+        while (end != string::npos) {
             exts.push_back("." + list.substr(start, end - start));
             start = end + 1;
             end = list.find(',', start);
         }
         exts.push_back("." + list.substr(start));
     } else {
-        std::regex single(R"(\.\/\*\.(.+))");
-        if (std::regex_search(globPat, match, single)) {
+        regex single(R"(\.\/\*\.(.+))");
+        if (regex_search(globPat, match, single)) {
             exts.push_back("." + match[1].str());
         }
     }
     return exts;
 }
 
-bool endsWith(const std::string& str, const std::string& suffix) {
+bool endsWith(const string& str, const string& suffix) {
     if (str.length() >= suffix.length()) {
         return (str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0);
     }
@@ -73,14 +74,14 @@ bool endsWith(const std::string& str, const std::string& suffix) {
 }
 
 void printHelp() {
-    std::cout << "Sorten - A CLI tool to sort files by extension\n\n";
-    std::cout << "Usage:\n";
-    std::cout << "  sorten run [path] [options]\n\n";
-    std::cout << "Commands:\n";
-    std::cout << "  run     Sort files in the specified directory (default: current directory '.')\n\n";
-    std::cout << "Options:\n";
-    std::cout << "  -c, --config <path>   Path to config.json (default: ./config.json)\n";
-    std::cout << "  -h, --help            Show this help message\n";
+    cout << "Sorten - A CLI tool to sort files by extension\n\n";
+    cout << "Usage:\n";
+    cout << "  sorten run [path] [options]\n\n";
+    cout << "Commands:\n";
+    cout << "  run     Sort files in the specified directory (default: current directory '.')\n\n";
+    cout << "Options:\n";
+    cout << "  -c, --config <path>   Path to config.json (default: ./config.json)\n";
+    cout << "  -h, --help            Show this help message\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -89,24 +90,24 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    std::string command = argv[1];
+    string command = argv[1];
     if (command == "-h" || command == "--help") {
         printHelp();
         return 0;
     }
 
     if (command != "run") {
-        std::cerr << "Unknown command: " << command << "\n\n";
+        cerr << "Unknown command: " << command << "\n\n";
         printHelp();
         return 1;
     }
 
-    std::string targetPath = ".";
-    std::string configPath = "./config.json";
+    string targetPath = ".";
+    string configPath = "./config.json";
 
     // Parse arguments after 'run'
     for (int i = 2; i < argc; ++i) {
-        std::string arg = argv[i];
+        string arg = argv[i];
         if ((arg == "-c" || arg == "--config") && i + 1 < argc) {
             configPath = argv[++i];
         } else if (arg[0] != '-') {
@@ -114,7 +115,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    std::map<std::string, std::string> rules;
+    map<string, string> rules;
     if (fs::exists(configPath)) {
         rules = parseConfig(configPath);
         if (rules.empty()) { // fallback if parsing failed or file was empty
@@ -125,11 +126,11 @@ int main(int argc, char* argv[]) {
     }
 
     // Map extensions to destination directories
-    std::map<std::string, std::string> extToKey;
+    map<string, string> extToKey;
     for (const auto& pair : rules) {
-        const std::string& key = pair.first;
-        const std::string& glob_pat = pair.second;
-        std::vector<std::string> exts = extractExtensions(glob_pat);
+        const string& key = pair.first;
+        const string& glob_pat = pair.second;
+        vector<string> exts = extractExtensions(glob_pat);
         for (const auto& ext : exts) {
             extToKey[ext] = key;
         }
@@ -137,26 +138,26 @@ int main(int argc, char* argv[]) {
 
     // Iterate target directory
     if (!fs::exists(targetPath) || !fs::is_directory(targetPath)) {
-        std::cerr << "Error: Target path '" << targetPath << "' is not a valid directory.\n";
+        cerr << "Error: Target path '" << targetPath << "' is not a valid directory.\n";
         return 1;
     }
 
     for (const auto& entry : fs::directory_iterator(targetPath)) {
         if (!entry.is_regular_file()) continue;
 
-        std::string filename = entry.path().filename().string();
-        std::string filepath = entry.path().string();
+        string filename = entry.path().filename().string();
+        string filepath = entry.path().string();
         
         // Skip dotfiles just like default fast-glob
         if (filename.front() == '.') continue;
         
-        std::string bestMatchExt = "";
-        std::string bestKey = "";
+        string bestMatchExt = "";
+        string bestKey = "";
 
         // Find matching extension
         for (const auto& pair : extToKey) {
-            const std::string& ext = pair.first;
-            const std::string& key = pair.second;
+            const string& ext = pair.first;
+            const string& key = pair.second;
             if (endsWith(filename, ext)) {
                 // Prefer longer extension match (e.g. .tar.gz over .gz)
                 if (ext.length() > bestMatchExt.length()) {
@@ -168,12 +169,12 @@ int main(int argc, char* argv[]) {
 
         if (bestKey.empty()) continue; // No match
 
-        std::string fsExt = entry.path().extension().string();
-        std::string extension;
+        string fsExt = entry.path().extension().string();
+        string extension;
 
         if (fsExt == ".gz") {
             size_t dotPos = filename.find('.');
-            if (dotPos != std::string::npos) {
+            if (dotPos != string::npos) {
                 extension = filename.substr(dotPos + 1);
             } else {
                 extension = fsExt.substr(1);
@@ -186,9 +187,9 @@ int main(int argc, char* argv[]) {
         }
 
         // Replace "@" in key with the extension
-        std::string destDir = bestKey;
+        string destDir = bestKey;
         size_t atPos = destDir.find('@');
-        if (atPos != std::string::npos) {
+        if (atPos != string::npos) {
             destDir.replace(atPos, 1, extension);
         }
 
@@ -198,10 +199,10 @@ int main(int argc, char* argv[]) {
             fs::create_directories(destPath.parent_path());
             
             // To ensure safe copying across devices if needed, standard practice is:
-            // But std::filesystem::rename is faster and works inside same filesystem.
+            // But filesystem::rename is faster and works inside same filesystem.
             // If it fails due to EXDEV, one would use copy() then remove(). 
             // In sorten-js `fsx.move` handles this. We will catch EXDEV and fallback to copy/remove.
-            std::error_code ec;
+            error_code ec;
             fs::rename(filepath, destPath, ec);
             if (ec) {
                 // Fallback to copy/remove
@@ -212,12 +213,12 @@ int main(int argc, char* argv[]) {
             }
             
             if (ec) {
-                std::cerr << "[" << filename << "]: " << ec.message() << std::endl;
+                cerr << "[" << filename << "]: " << ec.message() << endl;
             } else {
-                std::cout << filename << " moved successfully" << std::endl;
+                cout << filename << " moved successfully" << endl;
             }
-        } catch (const std::exception& e) {
-            std::cerr << "[" << filename << "]: " << e.what() << std::endl;
+        } catch (const exception& e) {
+            cerr << "[" << filename << "]: " << e.what() << endl;
         }
     }
 
