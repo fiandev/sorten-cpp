@@ -1,0 +1,68 @@
+name: Auto Release
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset_name: sorten-linux
+          - os: windows-latest
+            asset_name: sorten-windows.exe
+          - os: macos-latest
+            asset_name: sorten-macos
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compile sorten
+        run: g++ -std=c++20 -Wall -Wextra sorten.cpp -o ${{ matrix.asset_name }}
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: ${{ matrix.asset_name }}
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Generate Release Tag
+        id: generate_tag
+        run: echo "release_tag=v$(date +'%Y.%m.%d-%H%M%S')" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.generate_tag.outputs.release_tag }}
+          name: Release ${{ steps.generate_tag.outputs.release_tag }}
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/sorten-linux
+            artifacts/sorten-windows.exe
+            artifacts/sorten-macos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -9,18 +9,18 @@
 namespace fs = std::filesystem;
 
 const std::map<std::string, std::string> defaultRules = {
-  {"./multimedia/images/@", "./*.{jpg,png,webp,gif,jpeg}"},
-  {"./multimedia/videos/@", "./*.{mp4,mov}"},
-  {"./multimedia/audios/@", "./*.{mp3,m4a}"},
-  {"./files/archives/@", "./*.{zip,rar,tr.gz,7z,tar,tar.gz}"},
-  {"./files/codes/@", "./*.{xml,html,css,js,jsx,tsx,ts,sql,md,json}"},
-  {"./files/documents/@", "./*.{pdf,xlxx,docx,docs}"},
-  {"./files/applications/windows/@", "./*.{exe,msi}"},
-  {"./files/applications/android/@", "./*.apk"},
-  {"./files/applications/linux/debian/@", "./*.deb"},
-  {"./files/applications/bootables/@", "./*.iso"},
-  {"./files/transfers/@", "./*.torrent"},
-  {"./others/@", "./*.{bak,txt}"}
+    {"./multimedia/images/@", "./*.{jpg,png,webp,gif,jpeg,svg}"},
+    {"./multimedia/videos/@", "./*.{mp4,mov}"},
+    {"./multimedia/audios/@", "./*.{mp3,m4a}"},
+    {"./files/archives/@", "./*.{zip,rar,tr.gz,7z,tar,tar.gz}"},
+    {"./files/codes/@", "./*.{xml,html,css,js,jsx,tsx,ts,sql,md,json}"},
+    {"./files/documents/@", "./*.{pdf,xlxx,docx,docs}"},
+    {"./files/applications/windows/@", "./*.{exe,msi}"},
+    {"./files/applications/android/@", "./*.apk"},
+    {"./files/applications/linux/debian/@", "./*.deb"},
+    {"./files/applications/bootables/@", "./*.iso"},
+    {"./files/transfers/@", "./*.torrent"},
+    {"./others/@", "./*.{bak,txt}"}
 };
 
 // A very naive JSON parser for flat key-value string pairs
