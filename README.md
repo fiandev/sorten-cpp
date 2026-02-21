@@ -35,7 +35,13 @@ sudo mv sorten /usr/local/bin/
 
 ## Usage
 
-Run the tool in the directory containing the files you want to sort:
+Run the tool by specifying the `run` command. You can also provide an optional path to the directory you want to sort (defaults to the current directory):
+
+```bash
+sorten run .
+```
+
+To see the list of commands and options, simply run:
 
 ```bash
 sorten

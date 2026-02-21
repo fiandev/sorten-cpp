@@ -72,14 +72,45 @@ bool endsWith(const std::string& str, const std::string& suffix) {
     return false;
 }
 
+void printHelp() {
+    std::cout << "Sorten - A CLI tool to sort files by extension\n\n";
+    std::cout << "Usage:\n";
+    std::cout << "  sorten run [path] [options]\n\n";
+    std::cout << "Commands:\n";
+    std::cout << "  run     Sort files in the specified directory (default: current directory '.')\n\n";
+    std::cout << "Options:\n";
+    std::cout << "  -c, --config <path>   Path to config.json (default: ./config.json)\n";
+    std::cout << "  -h, --help            Show this help message\n";
+}
+
 int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        printHelp();
+        return 0;
+    }
+
+    std::string command = argv[1];
+    if (command == "-h" || command == "--help") {
+        printHelp();
+        return 0;
+    }
+
+    if (command != "run") {
+        std::cerr << "Unknown command: " << command << "\n\n";
+        printHelp();
+        return 1;
+    }
+
+    std::string targetPath = ".";
     std::string configPath = "./config.json";
 
-    // Parse arguments
-    for (int i = 1; i < argc; ++i) {
+    // Parse arguments after 'run'
+    for (int i = 2; i < argc; ++i) {
         std::string arg = argv[i];
         if ((arg == "-c" || arg == "--config") && i + 1 < argc) {
             configPath = argv[++i];
+        } else if (arg[0] != '-') {
+            targetPath = arg;
         }
     }
 
@@ -104,8 +135,13 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // Iterate current directory
-    for (const auto& entry : fs::directory_iterator(".")) {
+    // Iterate target directory
+    if (!fs::exists(targetPath) || !fs::is_directory(targetPath)) {
+        std::cerr << "Error: Target path '" << targetPath << "' is not a valid directory.\n";
+        return 1;
+    }
+
+    for (const auto& entry : fs::directory_iterator(targetPath)) {
         if (!entry.is_regular_file()) continue;
 
         std::string filename = entry.path().filename().string();
@@ -156,7 +192,7 @@ int main(int argc, char* argv[]) {
             destDir.replace(atPos, 1, extension);
         }
 
-        fs::path destPath = fs::path(destDir) / filename;
+        fs::path destPath = fs::path(targetPath) / destDir / filename;
 
         try {
             fs::create_directories(destPath.parent_path());
